@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from typing import Tuple, Set
+from typing import Tuple, Set, Optional
 import math
 import graphviz
 
@@ -163,6 +163,7 @@ class Val:
         self.grad = 1.0
         for n in reversed(topo):
             n._backward()
+
 
     def _trace_graph(self) -> Tuple[Set, Set]:
         """Traces the graphs edges from passed in node
