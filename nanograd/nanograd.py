@@ -4,6 +4,7 @@ from typing import Tuple, Set, Optional
 import math
 import graphviz
 
+
 """
 An implementation of a Nano Autograd Library 
 Inspired by (and heavily influence by) by Micrograd by Andrej Karpathy
@@ -17,12 +18,15 @@ class Val:
     """
 
     def __init__(
-        self, data: float, _label: str = None, _children: tuple = (), grad=True
+        self,
+        data: float,
+        _label: str = "",
+        _children: tuple = (),
     ) -> None:
         self.data: float = data  # Value
         self._label: str = _label  # Value from operation
-        self.grad: float = 0 if grad else 0  # Initial gradient
-        self._children: set[Val] = set(_children)
+        self.grad:float = 0
+        self._children: set = set(_children)
         self._backward = lambda: None
 
     def __add__(self, y):
@@ -63,7 +67,7 @@ class Val:
         x = Val(self.data**y.data, _label=f"**{y}", _children=(self,))
 
         def _backward():
-            self.grad += y * self ** (y - 1)
+            self.grad += y * self ** (y - 1) * x.grad
 
         x._backward = _backward
         return x
@@ -164,7 +168,6 @@ class Val:
         for n in reversed(topo):
             n._backward()
 
-
     def _trace_graph(self) -> Tuple[Set, Set]:
         """Traces the graphs edges from passed in node
         assuming that it is the root node
@@ -208,11 +211,8 @@ class Val:
 if __name__ == "__main__":
     x = Val(1.0)
     b = Val(3.0)
-    c = (x + b)
+    c = x + b
     y = c.tanh()
     y.backward()
     g = y.create_graph()
     g.render("test")
-
-
-
