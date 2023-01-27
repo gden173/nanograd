@@ -3,7 +3,6 @@ from typing import List
 from nanograd.nanograd import Val
 
 
-
 class Module:
     def zero_grad(self):
         for param in self.parameters():
@@ -15,18 +14,20 @@ class Module:
 
 class Neuron(Module):
     def __init__(self, in_dims: int, activation: str = "relu"):
-        self._activations = ['tanh', 'relu', 'sigmoid']
-        assert activation  in self._activations, f"{activation} not in {self._activations}"
+        self._activations = ["tanh", "relu", "sigmoid"]
+        assert (
+            activation in self._activations
+        ), f"{activation} not in {self._activations}"
         self.activation = activation
         self.in_dims = in_dims
-        self.weights = [Val(random.uniform(-1, 1)) for _ in range(self.in_dims)]
+        self.weights = [Val(random.normalvariate(0, 1)) for _ in range(self.in_dims)]
         self.bias = Val(0)
 
     def __call__(self, x):
         """Perform the forward pass through this layer"""
-        activation =  (sum(i * j for i, j in zip(self.weights, x)) + self.bias)
+        activation = sum(i * j for i, j in zip(self.weights, x)) + self.bias
 
-        # TODO: fix this 
+        # TODO: fix this
         if self.activation == "tanh":
             return activation.tanh()
 
@@ -68,28 +69,26 @@ class MLP(Module):
         self.num_in = layers[0].n_in
         self.num_out = layers[-1].n_out
 
-        # Check that the dimension of each layer works 
+        # Check that the dimension of each layer works
         if len(layers) > 1:
-            for i, (l1, l2) in enumerate(zip(layers, layers[1:])): 
-                assert l1.n_out == l2.n_in,  f"Layer {i} dimensions must agree !! {l1.n_out} != {l2.n_in}"
-
+            for i, (l1, l2) in enumerate(zip(layers, layers[1:])):
+                assert (
+                    l1.n_out == l2.n_in
+                ), f"Layer {i} dimensions must agree !! {l1.n_out} != {l2.n_in}"
 
     def __call__(self, x):
-        for l in self.layers: 
+        for l in self.layers:
             x = l(x)
         return x
-        
 
     def parameters(self):
         return [params for l in self.layers for params in l.parameters()]
 
     def __repr__(self):
-        layers: str = '\n'.join(f"Layer({l.n_in}, {l.n_out})" for l in self.layers)
+        layers: str = "\n".join(f"Layer({l.n_in}, {l.n_out})" for l in self.layers)
         return f"""
            MLP 
            {{
                {layers} 
             }}
            """
-
-

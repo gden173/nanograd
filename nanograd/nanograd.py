@@ -25,7 +25,7 @@ class Val:
     ) -> None:
         self.data: float = data  # Value
         self._label: str = _label  # Value from operation
-        self.grad:float = 0
+        self.grad: float = 0
         self._children: set = set(_children)
         self._backward = lambda: None
 
@@ -43,7 +43,6 @@ class Val:
         assert not isinstance(x.data, Val), "Add"
         return x
 
-
     def __radd__(self, y):
         """Reversed Addition"""
         return self + y
@@ -51,9 +50,11 @@ class Val:
     def __mul__(self, y):
         y = y if isinstance(y, Val) else Val(y)
         x = Val(self.data * y.data, _children=(self, y), _label="*")
+
         def _backward():
-            self.grad += y.grad * x.grad
-            y.grad += self.grad * x.grad
+            self.grad += y.data * x.grad
+            y.grad += self.data * x.grad
+
         x._backward = _backward
         return x
 
@@ -91,13 +92,13 @@ class Val:
 
     def __truediv__(self, y):
         """Division"""
-        return self * y**-1
+        return self * y**(-1)
 
     def __rtruediv__(self, y):
         """Reversed Division"""
-        return y * self**-1
+        return y * self**(-1)
 
-    def __len__(self): 
+    def __len__(self):
         return 1
 
     def relu(self):
@@ -120,7 +121,7 @@ class Val:
         x = Val(e, _children=(self,), _label="Exp")
 
         def _backward():
-            self.grad += e 
+            self.grad += e * x.grad
 
         x._backward = _backward
         return x
@@ -131,33 +132,35 @@ class Val:
         x._label = "Sigmoid"
 
         def _backward():
-            self.grad += (-self).exp().data / (((-self).exp() + 1).data ** 2)
+            self.grad += (x.data * (1 - x.data)) * x.grad
 
         x._backward = _backward
         return x
 
     def tanh(self):
         """Tanh Activation Function"""
-        x =   ((2 * self).exp() - 1) / ((2 * self).exp() + 1)
+        x = ((2 * self).exp() - 1)  * (((2 * self).exp() + 1) ** (-1))
+        xd2 = x.data ** 2
         x._label = "Tanh"
 
         def _backward():
-            self.grad += 2 / ((2 * self).exp() + 1).data ** 2
+            self.grad += (1 - xd2) * x.grad
 
         x._backward = _backward
         return x
-
 
     def backward(self) -> None:
         """Computes the backward pass"""
         _topo = []
         _visited = set()
+
         def topo(node):
             if node not in _visited:
                 _visited.add(node)
                 for child_node in node._children:
                     topo(child_node)
                 _topo.append(node)
+
         topo(self)
         self.grad = 1.0
         for n in reversed(_topo):
@@ -205,14 +208,9 @@ class Val:
 
 
 if __name__ == "__main__":
-    a = Val(2, _label = "a")
-    v = Val(6, _label = "v")
-    c = a * v
-    print(c)
-    print(c / 2)
-    print(2 / c)
-    print(c.exp())
-    print(c ** 2)
-    print(c / a)
-    print(c )
-
+    a = Val(2, _label="a")
+    b = a.sigmoid()
+    print(b)
+    b.backward()
+    print(b)
+    print(a)
