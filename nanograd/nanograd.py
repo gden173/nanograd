@@ -40,34 +40,35 @@ class Val:
             y.grad += x.grad
 
         x._backward = _backward
+        assert not isinstance(x.data, Val), "Add"
         return x
+
 
     def __radd__(self, y):
         """Reversed Addition"""
         return self + y
 
     def __mul__(self, y):
-        y = y if isinstance(y, Val) else Val(data=y)
+        y = y if isinstance(y, Val) else Val(y)
         x = Val(self.data * y.data, _children=(self, y), _label="*")
-
         def _backward():
             self.grad += y.grad * x.grad
             y.grad += self.grad * x.grad
-
         x._backward = _backward
-
         return x
 
     def __rmul__(self, y):
         return self * y
 
+    def item(self):
+        return self.data
+
     def __pow__(self, y):
-        assert isinstance(y, (float, int)), f"{y=} must be an int or a float"
-        y = y if isinstance(y, Val) else Val(data=y)
-        x = Val(self.data**y.data, _label=f"**{y}", _children=(self,))
+        assert isinstance(y, (float, int)), "only float or int powers"
+        x = Val(self.data**y, _label=f"**{y}", _children=(self,))
 
         def _backward():
-            self.grad += y * self ** (y - 1) * x.grad
+            self.grad += y * self.data ** (y - 1) * x.grad
 
         x._backward = _backward
         return x
@@ -96,76 +97,70 @@ class Val:
         """Reversed Division"""
         return y * self**-1
 
+    def __len__(self): 
+        return 1
+
     def relu(self):
         """Rectified Linear Unit Activation Function"""
         x = Val(max([0, self.data]), _children=(self,), _label="ReLU")
 
         def _backward():
-            self.grad += (x.grad > 0) * x.grad
+            self.grad += (x.data > 0) * x.grad
 
         x._backward = _backward
         return x
 
     def exp(self):
         """Exponential"""
-        x = Val(math.exp(self.data), _children=(self,), _label="Exp")
+        if isinstance(self.data, Val):
+            v = self.data.data
+        else:
+            v = self.data
+        e = math.exp(v)
+        x = Val(e, _children=(self,), _label="Exp")
 
         def _backward():
-            self.grad += math.exp(self.data)
+            self.grad += e 
 
         x._backward = _backward
         return x
 
     def sigmoid(self):
         """Sigmoid activation Function"""
-        x = Val(self.exp() / (self.exp() + 1), _children=(self,), _label="Sigmoid")
+        x = self.exp() / (self.exp() + 1)
+        x._label = "Sigmoid"
 
         def _backward():
-            self.grad += (-self).exp() / ((-self).exp() + 1) ** 2
+            self.grad += (-self).exp().data / (((-self).exp() + 1).data ** 2)
 
         x._backward = _backward
         return x
 
     def tanh(self):
         """Tanh Activation Function"""
-        x = Val(
-            ((2 * self).exp() - 1) / ((2 * self).exp() + 1),
-            _children=(self,),
-            _label="Tanh",
-        )
+        x =   ((2 * self).exp() - 1) / ((2 * self).exp() + 1)
+        x._label = "Tanh"
 
         def _backward():
-            self.grad += 2 / ((2 * self).exp() + 1) ** 2
+            self.grad += 2 / ((2 * self).exp() + 1).data ** 2
 
         x._backward = _backward
         return x
 
-    def _build_topological_graph(self, _topo: list, _visited: set) -> Tuple[list, set]:
-        """Builds a Topological Graph to compute the backwards pass"""
-
-        # Check if this node has been processed
-        if self not in _visited:
-
-            # Add the current node to the list
-            _visited.add(self)
-
-            # Add all child nodes to the list
-            for child_node in self._children:
-                # Traverse the child nodes
-                t, v = child_node._build_topological_graph(_topo, _visited)
-
-                _topo.extend(t)
-                _visited.update(v)
-
-            _topo.append(self)
-
-        return _topo, _visited
 
     def backward(self) -> None:
         """Computes the backward pass"""
-        topo, _ = self._build_topological_graph([], set())
+        _topo = []
+        _visited = set()
+        def topo(node):
+            if node not in _visited:
+                _visited.add(node)
+                for child_node in node._children:
+                    topo(child_node)
+                _topo.append(node)
+        topo(self)
         self.grad = 1.0
-        for n in reversed(topo):
+        for n in reversed(_topo):
             n._backward()
 
     def _trace_graph(self) -> Tuple[Set, Set]:
@@ -177,12 +172,13 @@ class Val:
     def _process_node(
         self, _nodes: Set = set(), _edges: Set = set()
     ) -> Tuple[set, set]:
+        _n, _e = set(), set()
         if self not in _nodes:
             _nodes.add(self)
             for child_node in self._children:
                 _edges.add((child_node, self))
-                _nodes, _edges = Val._process_node(child_node, _nodes, _edges)
-        return _nodes, _edges
+                _n, _e = Val._process_node(child_node, _nodes, _edges)
+        return _n, _e
 
     @property
     def _sID(self):
@@ -209,10 +205,14 @@ class Val:
 
 
 if __name__ == "__main__":
-    x = Val(1.0)
-    b = Val(3.0)
-    c = x + b
-    y = c.tanh()
-    y.backward()
-    g = y.create_graph()
-    g.render("test")
+    a = Val(2, _label = "a")
+    v = Val(6, _label = "v")
+    c = a * v
+    print(c)
+    print(c / 2)
+    print(2 / c)
+    print(c.exp())
+    print(c ** 2)
+    print(c / a)
+    print(c )
+
