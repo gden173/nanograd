@@ -23,7 +23,7 @@ pip install nanodiff
 
 ## Basic Usage 
 
-A small MLP  binary classifier can be found in the [Example Binary Classifier][example_binary_classifier.ipynb]. 
+A small MLP binary classifier can be found in the [Example Binary Classifier](example_binary_classifier.ipynb)
 
 
 ## Micrograd
