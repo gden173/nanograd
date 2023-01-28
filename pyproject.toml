@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nanograd"
+version = "0.0.1"
+description = "Micrograd Inspired Autodiff engine"
+authors = [{name = "Gabriel Dennis", email = "gabrieldennis17@gmail.com"}]
+readme = "README.md"
+requires-python = ">=3.8.1"
+license = {text = "MIT"}
+dependencies = [
+    "torch", 
+    "graphviz", 
+]
