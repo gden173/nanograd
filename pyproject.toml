@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nanograd"
+name = "nanodiff"
 version = "0.0.1"
 description = "Micrograd Inspired Autodiff engine"
 authors = [{name = "Gabriel Dennis", email = "gabrieldennis17@gmail.com"}]

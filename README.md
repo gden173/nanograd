@@ -18,7 +18,7 @@ A Micrograd inspired (and largely copied) small autodiff engine.
 Nanograd can be installed from pypi via 
 
 ``` shell
-pip install nanograd 
+pip install nanodiff 
 ```
 
 ## Basic Usage 
