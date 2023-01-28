@@ -1,7 +1,7 @@
 """Copies the tests from micrograd 
    to ensure consistenanograd_c_valy"""
-
-import torch
+# pylint: skip-file
+from torch import tensor
 from nanograd.nanograd import Val
 
 TOLERANCE = 1e-6
@@ -13,8 +13,8 @@ def test_addition():
     nanograd_b_val = Val(8.0)
     nanograd_c_val = nanograd_a_val + nanograd_b_val
     nanograd_c_val.backward()
-    torch_a_val = torch.tensor(-4.0, requires_grad=True)
-    torch_b_val = torch.tensor(8.0, requires_grad=True)
+    torch_a_val = tensor(-4.0, requires_grad=True)
+    torch_b_val = tensor(8.0, requires_grad=True)
     torch_c_val = torch_a_val + torch_b_val
     torch_c_val.retain_grad()
     torch_c_val.backward()
@@ -30,8 +30,8 @@ def test_multiplication():
     nanograd_b_val = Val(8.0)
     nanograd_c_val = nanograd_a_val * nanograd_b_val
     nanograd_c_val.backward()
-    torch_a_val = torch.tensor(-4.0, requires_grad=True)
-    torch_b_val = torch.tensor(8.0, requires_grad=True)
+    torch_a_val = tensor(-4.0, requires_grad=True)
+    torch_b_val = tensor(8.0, requires_grad=True)
     torch_c_val = torch_a_val * torch_b_val
     torch_c_val.retain_grad()
     torch_c_val.backward()
@@ -48,8 +48,8 @@ def test_division():
     nanograd_b_val = Val(8.0)
     nanograd_c_val = nanograd_a_val / nanograd_b_val
     nanograd_c_val.backward()
-    torch_a_val = torch.tensor(-4.0, requires_grad=True)
-    torch_b_val = torch.tensor(8.0, requires_grad=True)
+    torch_a_val = tensor(-4.0, requires_grad=True)
+    torch_b_val = tensor(8.0, requires_grad=True)
     torch_c_val = torch_a_val / torch_b_val
     torch_c_val.retain_grad()
     torch_c_val.backward()
@@ -65,7 +65,7 @@ def test_powers():
     nanograd_a_val = Val(4.0)
     nanograd_c_val = nanograd_a_val**4.5
     nanograd_c_val.backward()
-    torch_a_val = torch.tensor(4.0, requires_grad=True)
+    torch_a_val = tensor(4.0, requires_grad=True)
     torch_c_val = torch_a_val**4.5
     torch_c_val.retain_grad()
     torch_c_val.backward()
@@ -80,7 +80,7 @@ def test_exp():
     nanograd_a_val = Val(2.0)
     nanograd_c_val = nanograd_a_val.exp()
     nanograd_c_val.backward()
-    torch_a_val = torch.tensor(2.0, requires_grad=True)
+    torch_a_val = tensor(2.0, requires_grad=True)
     torch_c_val = torch_a_val.exp()
     torch_c_val.retain_grad()
     torch_c_val.backward()
@@ -97,7 +97,7 @@ def test_tanh():
     nanograd_c_val.backward()
     print(nanograd_a_val.grad)
 
-    torch_a_val = torch.tensor(2.0, requires_grad=True)
+    torch_a_val = tensor(2.0, requires_grad=True)
     torch_c_val = torch_a_val.tanh()
     torch_c_val.retain_grad()
     torch_c_val.backward()
@@ -113,7 +113,7 @@ def test_sigmoid():
     nanograd_c_val.backward()
     print(nanograd_a_val.grad)
 
-    torch_a_val = torch.tensor(2.0, requires_grad=True)
+    torch_a_val = tensor(2.0, requires_grad=True)
     torch_c_val = torch_a_val.sigmoid()
     torch_c_val.retain_grad()
     torch_c_val.backward()
@@ -133,7 +133,7 @@ def test_relu():
     y_var.backward()
     x_grad_var, y_grad_var = x_var, y_var
 
-    x_var = torch.Tensor([-4.0]).double()
+    x_var = tensor([-4.0]).double()
     x_var.requires_grad = True
     z_var = 2 * x_var + 2 + x_var
     q_var = z_var.relu() + z_var * x_var
@@ -155,7 +155,7 @@ def test_tanh_2():
     y_var.backward()
     x_nano_grad, y_nano_grad = x_var, y_var
 
-    x_var = torch.Tensor([-4.0]).double()
+    x_var = tensor([-4.0]).double()
     x_var.requires_grad = True
     z_var = 2 * x_var + 2 + x_var
     q_var = z_var.relu() + z_var * x_var
@@ -177,7 +177,7 @@ def test_sigmoid_2():
     y_var.backward()
     x_nano_grad, y_nano_grad = x_var, y_var
 
-    x_var = torch.Tensor([-4.0]).double()
+    x_var = tensor([-4.0]).double()
     x_var.requires_grad = True
     z_var = 2 * x_var + 2 + x_var
     q_var = z_var.relu() + z_var * x_var
@@ -206,8 +206,8 @@ def test_more_ops():
     g_var.backward()
     a_nano_grad, b_nano_grad, c_nano_grad = a_var, b_var, g_var
 
-    a_var = torch.Tensor([-4.0]).double()
-    b_var = torch.Tensor([2.0]).double()
+    a_var = tensor([-4.0]).double()
+    b_var = tensor([2.0]).double()
     a_var.requires_grad = True
     b_var.requires_grad = True
     c_var = a_var + b_var
