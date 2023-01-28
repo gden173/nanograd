@@ -99,7 +99,8 @@ def test_tanh():
     assert abs(nc.item() - ct.item()) < TOLERANCE
     assert abs(at.grad.item() - na.grad) < TOLERANCE
     assert abs(ct.grad.item() - nc.grad) < TOLERANCE
-    
+
+
 def test_sigmoid():
     na = Val(2.0)
     nc = na.sigmoid()
@@ -114,7 +115,10 @@ def test_sigmoid():
     assert abs(at.grad.item() - na.grad) < TOLERANCE
     assert abs(ct.grad.item() - nc.grad) < TOLERANCE
 
+
 """Micrograds Test"""
+
+
 def test_sanity_check_relu():
     x = Val(-4.0)
     z = 2 * x + 2 + x
@@ -157,7 +161,6 @@ def test_sanity_check_tanh():
     assert xmg.grad == xpt.grad.item()
 
 
-
 def test_sanity_check_sigmoid():
     x = Val(-4.0)
     z = 2 * x + 2 + x
@@ -177,7 +180,6 @@ def test_sanity_check_sigmoid():
     xpt, ypt = x, y
     assert ymg.data == ypt.data.item()
     assert xmg.grad == xpt.grad.item()
-
 
 
 def test_more_ops():
