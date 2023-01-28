@@ -1,5 +1,5 @@
 """
-Implements the NN classes 
+Implements the NN classes
 """
 
 import random

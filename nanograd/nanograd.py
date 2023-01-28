@@ -191,7 +191,7 @@ class Val:
 
         self.grad = 1.0
         for node in reversed(_topo):
-            node._backward()
+            node._backward() # pylint: disable-all
 
     def _trace_graph(self) -> Tuple[Set, Set]:
         """Traces the graphs edges from passed in node
