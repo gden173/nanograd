@@ -1,5 +1,6 @@
-"""Copies the tests from micrograd 
-   to ensure consistenanograd_c_valy"""
+"""Copies the tests from micrograd
+   to ensure consistey"""
+
 # pylint: skip-file
 from torch import tensor
 from nanograd.nanograd import Val

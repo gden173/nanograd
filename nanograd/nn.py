@@ -90,7 +90,10 @@ class MLP(Module):
             for i, (layer_1, layer_2) in enumerate(zip(layers, layers[1:])):
                 assert (
                     layer_1.n_out == layer_2.n_in
-                ), f"Layer {i} dimensions must agree !! {layer_1.n_out} != {layer_2.n_in}"
+                ), f"""
+                Layer {i} dimensions must agree !!
+                {layer_1.n_out} != {layer_2.n_in}
+                """
 
     def __call__(self, inputs):
         for layer in self.layers:
@@ -98,12 +101,14 @@ class MLP(Module):
         return inputs
 
     def parameters(self):
-        return [params for l in self.layers for params in l.parameters()]
+        return [params for layer in self.layers for params in layer.parameters()]
 
     def __repr__(self):
-        layers: str = "\n".join(f"Layer({l.n_in}, {l.n_out})" for l in self.layers)
+        layers: str = "\n".join(
+            f"Layer({layer.n_in}, {layer.n_out})" for layer in self.layers
+        )
         return f"""
-           MLP 
+           MLP
            {{
                {layers} 
             }}

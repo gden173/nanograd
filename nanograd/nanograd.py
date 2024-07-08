@@ -28,7 +28,9 @@ class Val:
 
     def __add__(self, other_val):
         """Addition"""
-        other_val = other_val if isinstance(other_val, Val) else Val(data=other_val)
+        other_val = (
+            other_val if isinstance(other_val, Val) else Val(data=other_val)
+            )
         output = Val(
             self.data + other_val.data, _children=(self, other_val), _label="+"
         )
@@ -92,7 +94,11 @@ class Val:
 
     def __pow__(self, other_val):
         assert isinstance(other_val, (float, int)), "only float or int powers"
-        output = Val(self.data**other_val, _label=f"**{other_val}", _children=(self,))
+        output = Val(
+                self.data**other_val,
+                _label=f"**{other_val}",
+                _children=(self,)
+        )
 
         def _backward():
             self.grad += other_val * self.data ** (other_val - 1) * output.grad
